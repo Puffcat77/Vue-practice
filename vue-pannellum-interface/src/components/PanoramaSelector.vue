@@ -1,19 +1,21 @@
 <template>
-    <select
+    <v-select
         @change='sceneChanged()'
-        v-model='selected'>
-        <option disabled value=''>{{baseOptionText}}</option>
-        <option v-for='scene in scenes'
-            :key='scene.id'
-            :value='scene'>{{ scene.title }}</option>
-    </select>
+        v-model='selected'
+        :disabled='disabilityCondition'
+        :label='baseOptionText'
+        :items='scenes'
+        item-text='title'
+        item-value='path'>
+    </v-select>
 </template>
 
 <script>
 export default {
     props: [
         'scenes',
-        'baseOptionText'
+        'baseOptionText',
+        'disabilityCondition'
     ],
     data() {
         return {
