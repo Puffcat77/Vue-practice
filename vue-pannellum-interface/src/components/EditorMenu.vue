@@ -1,79 +1,104 @@
 <template>
     <div id='menu'>
         <fieldset>
-          <legend>Current panorama</legend>
+          <legend>Текущая панорама</legend>
           <PanoramaSelector
           :scenes='scenes'
-          :baseOptionText='"Choose current panorama"'
+          :baseOptionText='"Выберите текущую панораму"'
           @sceneChanged='currentSceneChanged'></PanoramaSelector>
         </fieldset>
         <fieldset>
-          <legend>Panorama editor</legend>
+          <legend>Редактор панорамы</legend>
             <v-checkbox v-model='panoramaIsEditing'
-            label='Panorama is editing'
-            :disabled='!currentSceneSelected'>
+            label='Панорама редактируется'
+            :disabled='!currentSceneSelected'
+            @change='editingModeChanged()'>
             </v-checkbox>
+            <v-btn 
+            :disabled='!panoramaIsEditing'
+            rounded
+            @click='getCenterClicked()'>Координаты центра</v-btn>
             <v-select v-model='spotType'
               :disabled='isInputDisabled'
               :items='spotTypes'
               item-text='text'
               item-value='value'
-              label='Choose spot type'>
+              label='Выберите тип метки'>
             </v-select>
             <PanoramaSelector  
               :disabilityCondition='isTransitSceneDisabeled'
               :scenes='scenes' 
-              :baseOptionText='"Choose panorama for transition"'
+              :baseOptionText='"Выберите панораму для перехода"'
               @sceneChanged='transitionSceneChanged'></PanoramaSelector>
-          <v-text-field v-model='pitch' label='pitch' :disabled='isInputDisabled'></v-text-field>
-          <v-text-field label='yaw' v-model='yaw' :disabled='isInputDisabled'></v-text-field>
-          <v-text-field label='description' v-model='description' :disabled='isInputDisabled'></v-text-field>
-          <v-btn-toggle id='buttons'>
-            <v-btn :disabled='isButtonDisabled'>Add spot</v-btn>
-            <v-btn :disabled='isButtonDisabled'>Delete spot</v-btn>
-            <v-btn :disabled='isButtonDisabled'>Move spot</v-btn>
-          </v-btn-toggle>
+          <v-text-field label='Вертикаль' v-model='controller.pitch' :disabled='isInputDisabled'></v-text-field>
+          <v-text-field label='Горизонталь' v-model='controller.yaw' :disabled='isInputDisabled'></v-text-field>
+          <v-text-field label='Описание' v-model='controller.text' :disabled='isInputDisabled'></v-text-field>
+          <v-row justify="center">
+            <v-chip color='green' class='spot-selected' outlined v-show='controller.currentSpot != undefined'> {{ getCurrentSpotText() }}</v-chip>
+          </v-row>
+          <v-container>
+            <v-row justify="space-around">
+              <v-btn :disabled='isButtonDisabled' @click='addHotSpot' rounded>Добавить метку</v-btn>
+              <v-btn :disabled='isSpotEditButtonDisabled' @click='deleteHotSpot' rounded>Удалить метку</v-btn>
+              <v-btn :disabled='isSpotEditButtonDisabled' @click='moveHotSpot' rounded>Переместить метку</v-btn>
+            </v-row>
+            <v-row  justify='center'>
+              <v-btn :disabled='true' id='syncronise-btn' rounded>Синхронизировать</v-btn>
+              <UploadImages id='pano-load-btn' @change='handleImages' uploadMsg='Нажмите, чтобы загрузить или перетяните сюда панорамы.'/>
+            </v-row>
+          </v-container>
         </fieldset>
       </div>
 </template>
 
 <script>
-import PanoramaSelector from '@/components/PanoramaSelector'
+import PanoramaSelector from '@/components/PanoramaSelector';
+import UploadImages from "vue-upload-drop-images"
+
+let panoramas = [
+  {
+    path: 'panoramas/2.jpg',
+    title: 'Доска'
+  },
+  {
+    path: 'panoramas/1.jpg',
+    title: 'Середина комнаты'
+  } 
+]
 
 export default {
     name: 'EditorMenu',
-
+    props: ['controller'],
+    components: {
+      PanoramaSelector,
+      UploadImages
+    },
     data() {
-    return {
-      scenes: [
-        {
-          id: 0,
-          path: 'panoramas/1.jpg',
-          title: 'Entry'
-        },
-        {
-          id: 1,
-          path: 'panoramas/2.jpg',
-          title: 'Middle of the room'
-        }
-      ],
-      currentScene: undefined,
-      transitionScene: undefined,
-      panoramaIsEditing: false,
-      spotTypes: [
-        {
-          value: 'info',
-          text: 'Info spot'
-        },
-        {
-          value: 'scene',
-          text: 'Transition spot'
-        }
-      ],
-      spotType: 'info',
-      pitch: '',
-      yaw: '',
-      description: ''
+      return {
+        scenes: [],
+        currentScene: undefined,
+        transitionScene: undefined,
+        panoramaIsEditing: false,
+        spotTypes: [
+          {
+            value: 'info',
+            text: 'Информационная'
+          },
+          {
+            value: 'scene',
+            text: 'Переход'
+          }
+        ],
+        spotType: 'info',
+    }
+  },
+  created() {
+    for (let i = 0; i < panoramas.length; i++) {
+      this.scenes.push({
+        id: i,
+        path: panoramas[i].path,
+        title: panoramas[i].title
+      })
     }
   },
   computed: {
@@ -81,17 +106,18 @@ export default {
       return !this.panoramaIsEditing;
     },
     isButtonDisabled() {
-      let isPitchAcceptable = this.pitch != '' &&
-         !isNaN(parseFloat(this.pitch)) &&
-         parseFloat(this.pitch) <= 180 &&
-         parseFloat(this.pitch) >= -180;
-      let isYawAcceptable = this.yaw != '' &&
-         !isNaN(parseFloat(this.yaw)) &&
-         parseFloat(this.yaw) <= 90 &&
-         parseFloat(this.yaw) >= -90;
-      let isDescriptionAcceptaple = this.description != '';
+      let isPitchAcceptable = 
+         parseFloat(this.controller.pitch) <= 180 &&
+         parseFloat(this.controller.pitch) >= -180;
+      let isYawAcceptable = 
+         parseFloat(this.controller.yaw) <= 90 &&
+         parseFloat(this.controller.yaw) >= -90;
+      let isDescriptionAcceptaple = this.controller.text != '';
       let isTransitionSceneChosen = this.spotType == 'scene' && this.transitionScene != undefined || this.spotType == 'info';
-      return !isPitchAcceptable || !isYawAcceptable || !isDescriptionAcceptaple || !isTransitionSceneChosen || !this.panoramaIsEditing;
+      return !(isPitchAcceptable && isYawAcceptable && isDescriptionAcceptaple && isTransitionSceneChosen && this.panoramaIsEditing);
+    },
+    isSpotEditButtonDisabled() {
+      return !(!this.isButtonDisabled && (this.controller.currentSpot != undefined));
     },
     currentSceneSelected() {
       return this.currentScene != undefined;
@@ -100,16 +126,73 @@ export default {
       return !this.panoramaIsEditing || this.spotType != 'scene' || this.spotType == undefined; 
     }
   },
+  
   methods: {
     currentSceneChanged(scene) {
       this.currentScene = scene;
+      this.controller.loadScene(this.currentScene);
+      this.controller.setHomeScenePath(this.currentScene);
+    },
+    getCurrentSpotText() {
+      return this.controller.currentSpot ? 'Выбрана точка:' + this.controller.currentSpot.text : undefined;
     },
     transitionSceneChanged(scene) {
       this.transitionScene = scene;
     },
-  },
-  components: {
-    PanoramaSelector
+    editingModeChanged() {
+      this.controller.setEditingMode(this.panoramaIsEditing);
+      this.controller.displayCross();
+    },
+    getCenterClicked() {
+      this.controller.setCenterPosition();
+    },
+    addHotSpot() {
+      this.controller.addHotSpot(
+        this.spotType, undefined, this.transitionScene);
+    },
+    deleteHotSpot() {
+      this.controller.removeHotSpot();
+    },
+    moveHotSpot() {
+      this.controller.moveHotSpot();
+    },
+    handleImages(files) {
+      files.forEach(file => {
+        if (file.type === 'text/html' ||
+            file.type === 'text/css' ||
+            file.type === 'text/javascript')
+        return;
+
+        let name = file.name.split('.')[0];
+        let url = URL.createObjectURL(file)
+
+        this.scenes.push({
+          path: url,
+          title: name
+        })
+      });
+    }
   }
 }
 </script>
+
+<style>
+fieldset {
+  padding: 5px;
+}
+
+
+.spot-selected {
+  border-radius: 20%;
+  align-self: center;
+  justify-self: center;
+}
+
+
+
+#syncronise-btn,  #load-pano-btn {
+   width: 50%;
+   margin-top: 10px;
+   margin-bottom: 10px;
+}
+</style>

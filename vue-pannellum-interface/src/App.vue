@@ -1,16 +1,17 @@
 <template>
   <v-app>
-    <EditorMenu></EditorMenu>
+    <EditorApp>
+    </EditorApp>
   </v-app>
 </template>
 
 <script>
-import EditorMenu from '@/components/EditorMenu'
+import EditorApp from '@/components/EditorApp'
 
 export default {
   name: 'App',
   components:{
-    EditorMenu
+    EditorApp
   }
 };
 </script>
