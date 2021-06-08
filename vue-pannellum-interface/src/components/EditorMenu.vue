@@ -55,17 +55,6 @@
 import PanoramaSelector from '@/components/PanoramaSelector';
 import UploadImages from "vue-upload-drop-images"
 
-let panoramas = [
-  {
-    path: 'panoramas/2.jpg',
-    title: 'Доска'
-  },
-  {
-    path: 'panoramas/1.jpg',
-    title: 'Середина комнаты'
-  } 
-]
-
 export default {
     name: 'EditorMenu',
     props: ['controller'],
@@ -93,13 +82,6 @@ export default {
     }
   },
   created() {
-    for (let i = 0; i < panoramas.length; i++) {
-      this.scenes.push({
-        id: i,
-        path: panoramas[i].path,
-        title: panoramas[i].title
-      })
-    }
   },
   computed: {
     isInputDisabled() {
@@ -134,7 +116,7 @@ export default {
       this.controller.setHomeScenePath(this.currentScene);
     },
     getCurrentSpotText() {
-      return this.controller.currentSpot ? 'Выбрана точка:' + this.controller.currentSpot.text : undefined;
+      return this.controller.currentSpot ? 'Выбрана точка: ' + this.controller.currentSpot.text : undefined;
     },
     transitionSceneChanged(scene) {
       this.transitionScene = scene;
