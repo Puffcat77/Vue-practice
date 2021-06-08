@@ -1,0 +1,59 @@
+[33mcommit 050ea138ad1199063c243b1770dd4aa4ffb00a66[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Tue Jun 8 05:55:11 2021 +0300
+
+    Remove test panoramas in preload
+
+[33mcommit f634f53fe57575cf90110ac4a2a007e670435166[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Tue Jun 8 05:48:26 2021 +0300
+
+    remove test images
+
+[33mcommit 7bd3397027ad1f2d590d63159add4301c6faca90[m[33m ([m[1;31mgithub/master[m[33m)[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Tue Jun 8 05:34:20 2021 +0300
+
+    Add drag-n-drop pano function and PhotoSphereViewer prototypr
+
+[33mcommit 9a554f7033c9808e46b75862898fa78f63646b09[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Tue May 4 23:47:40 2021 +0300
+
+    add Pannellum viewer, interface and pano load
+
+[33mcommit ebae27be91bb2bf06ffa1397fef22c5c76fff7c9[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Tue Dec 8 17:56:29 2020 +0300
+
+    add panorama editor menu components
+
+[33mcommit 5ecc40a8e4aeee566f518f74fe58f426e33c445e[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Tue Dec 8 16:10:52 2020 +0300
+
+    add vue app
+
+[33mcommit 030473639c8458202195534c56bc724f338b1aaf[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Tue Dec 8 15:42:23 2020 +0300
+
+    remove previous version
+
+[33mcommit 9aa5cccf8e40cf7b895e995a2cbb5bde6ca10c4a[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Tue Dec 8 15:36:31 2020 +0300
+
+    add base vue app with interface
+
+[33mcommit ad630cf8b2d6ec9bd5febc79f71a7af8a28e8b77[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Fri Dec 4 00:14:04 2020 +0300
+
+    add base vue app configuration
+
+[33mcommit b8311b56be86116deed96a2c3d05a16c1b38f0ec[m
+Author: Акопян Александр Айрапетович <akopia-sasha@mail.ru>
+Date:   Sun Nov 29 21:34:55 2020 +0300
+
+    initital commit
