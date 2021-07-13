@@ -10,15 +10,15 @@ This is a diploma project of management system for panorama series which uses:
 3. Write `npm run serve` to run developer version or `npm run build` to build version.
 ## Page content
 In loaded page you will see Pannellum.js viewer on the left side of the page and control menu on the right side. Control menu has:
-	1. Starting panorama selector where you can select your rooting panorama.
-	2. Editor checkbox for enabling/disabling editing mode.
-	3. Cross coordinates button.
-	4. Mark type selector.
-	5. Panorama for transitioning selector.
-	6. Mark pitch, yaw and description input fields.
-	7.  Control buttons for marks (add, remove and move).
-	8.  Save button to save changes.
-	9.  Drag'n'drop area for loading panoramas.
+1. Starting panorama selector where you can select your rooting panorama.
+2. Editor checkbox for enabling/disabling editing mode.
+3. Cross coordinates button.
+4. Mark type selector.
+5. Panorama for transitioning selector.
+6. Mark pitch, yaw and description input fields.
+7.  Control buttons for marks (add, remove and move).
+8.  Save button to save changes.
+9.  Drag'n'drop area for loading panoramas.
 
 ## How to use
 1. Select your starting panorama in the first selector.
