@@ -3,13 +3,10 @@
         <Header></Header>
         <v-row>
             <v-col>
-                <ViewerContainer 
-                    :controller="viewerController"
-                    ></ViewerContainer>
+                <ViewerContainer></ViewerContainer>
             </v-col>
             <v-col>
-                <EditorMenu
-                :controller="viewerController"></EditorMenu>
+                <EditorMenu></EditorMenu>
             </v-col>
         </v-row>
     </v-container>
@@ -19,22 +16,16 @@
 import EditorMenu from '@/components/EditorMenu';
 import ViewerContainer from '@/components/ViewerContainer';
 import Header from '@/components/Header';
-import Controller from '@/controller.js';
-
-let controller = new Controller();
-document.controller = controller;
 
 export default {
-  name: 'App',
+  name: 'EditorApp',
   components:{
     EditorMenu,
     ViewerContainer,
-    Header
+    Header,
   },
-  data() {
-      return {
-          viewerController: controller
-      }
+  data() { 
+      return {}
   }
 };
 </script>

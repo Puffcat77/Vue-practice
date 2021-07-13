@@ -1,17 +1,18 @@
 <template>
-    <div id='viewer-container'></div>
+    <div class='viewer-container'></div>
 </template>
 
 <script type='module'>
+import ControllerService from './ControllerService';
 
 export default {
     name: 'viewerContainer',
-    props: ['controller'],
     data() {
         return {};
     },
     mounted() {
-        this.$el.appendChild(this.controller.getViewerContainer());
+        this.$el.appendChild(ControllerService.controller.getViewerContainer());
+        this.$el.onclick = () => { ControllerService.containerTouched()};
     }
 }
 </script>
@@ -20,8 +21,9 @@ export default {
 </style>
 
 <style scoped>
-    #viewer-container {
+    .viewer-container {
         width: 100%;
         height: 100%;
+        margin-top: 10px;
     }
 </style>

@@ -14,7 +14,7 @@
     "vue": "^2.6.11",
     "vue-i18n": "^8.22.3",
     "vue-upload-drop-images": "^1.0.4",
-    "vuetify": "^2.3.21"
+    "vuetify": "^2.5.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

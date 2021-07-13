@@ -33,17 +33,20 @@
           <v-text-field label='Вертикаль' v-model='controller.pitch' :disabled='isInputDisabled'></v-text-field>
           <v-text-field label='Горизонталь' v-model='controller.yaw' :disabled='isInputDisabled'></v-text-field>
           <v-text-field label='Описание' v-model='controller.text' :disabled='isInputDisabled'></v-text-field>
-          <v-row justify="center">
-            <v-chip color='green' class='spot-selected' outlined v-show='controller.currentSpot != undefined'> {{ getCurrentSpotText() }}</v-chip>
-          </v-row>
-          <v-container>
-            <v-row justify="space-around">
+          <v-container id='menu-btns'>
+            <v-row justify="center" id='spot-selected-indicator'>
+              <v-chip color='green' class='spot-selected' outlined > {{ getCurrentSpotText() }}</v-chip>
+            </v-row>
+            <v-row justify="space-around" class='mb-5'>
               <v-btn :disabled='isButtonDisabled' @click='addHotSpot' rounded>Добавить метку</v-btn>
               <v-btn :disabled='isSpotEditButtonDisabled' @click='deleteHotSpot' rounded>Удалить метку</v-btn>
               <v-btn :disabled='isSpotEditButtonDisabled' @click='moveHotSpot' rounded>Переместить метку</v-btn>
             </v-row>
-            <v-row  justify='center'>
-              <v-btn :disabled='true' id='syncronise-btn' rounded>Синхронизировать</v-btn>
+            <v-row  justify='center' class="mb-5">
+              <v-btn :disabled='true' id='save-btn' rounded>Сохранить данные</v-btn>
+              <v-btn :disabled='true' id='load-btn' rounded>Загрузить данные</v-btn>
+              </v-row>
+            <v-row class='row-btns'>
               <UploadImages id='pano-load-btn' @change='handleImages' uploadMsg='Нажмите, чтобы загрузить или перетяните сюда панорамы.'/>
             </v-row>
           </v-container>
@@ -54,15 +57,15 @@
 <script>
 import PanoramaSelector from '@/components/PanoramaSelector';
 import UploadImages from "vue-upload-drop-images"
+import ControllerService from './ControllerService';
 
 export default {
-    name: 'EditorMenu',
-    props: ['controller'],
-    components: {
-      PanoramaSelector,
-      UploadImages
-    },
-    data() {
+  name: 'EditorMenu',
+  components: {
+    PanoramaSelector,
+    UploadImages
+  },
+  data() {
       return {
         scenes: [],
         currentScene: undefined,
@@ -79,27 +82,26 @@ export default {
           }
         ],
         spotType: 'info',
+        controller: ControllerService.controller,
+        currentSpot: ControllerService.controller.currentSpot
     }
   },
   created() {
+    ControllerService.menu = this;
   },
   computed: {
     isInputDisabled() {
       return !this.panoramaIsEditing;
     },
     isButtonDisabled() {
-      let isPitchAcceptable = 
-         parseFloat(this.controller.pitch) <= 180 &&
-         parseFloat(this.controller.pitch) >= -180;
-      let isYawAcceptable = 
-         parseFloat(this.controller.yaw) <= 90 &&
-         parseFloat(this.controller.yaw) >= -90;
+      let isPitchAcceptable = true;
+      let isYawAcceptable = true;
       let isDescriptionAcceptaple = this.controller.text != '';
       let isTransitionSceneChosen = this.spotType == 'scene' && this.transitionScene != undefined || this.spotType == 'info';
       return !(isPitchAcceptable && isYawAcceptable && isDescriptionAcceptaple && isTransitionSceneChosen && this.panoramaIsEditing);
     },
     isSpotEditButtonDisabled() {
-      return !(!this.isButtonDisabled && (this.controller.currentSpot != undefined));
+      return !this.panoramaIsEditing || this.currentSpot == undefined;
     },
     currentSceneSelected() {
       return this.currentScene != undefined;
@@ -110,13 +112,16 @@ export default {
   },
   
   methods: {
+    updateCurrentSpot() {
+      this.currentSpot = ControllerService.controller.currentSpot;
+    },
     currentSceneChanged(scene) {
       this.currentScene = scene;
       this.controller.loadScene(this.currentScene);
       this.controller.setHomeScenePath(this.currentScene);
     },
     getCurrentSpotText() {
-      return this.controller.currentSpot ? 'Выбрана точка: ' + this.controller.currentSpot.text : undefined;
+      return this.currentSpot ? 'Выбрана метка: ' + this.currentSpot.text : 'Метка не выбрана';
     },
     transitionSceneChanged(scene) {
       this.transitionScene = scene;
@@ -131,12 +136,15 @@ export default {
     addHotSpot() {
       this.controller.addHotSpot(
         this.spotType, undefined, this.transitionScene);
+      this.updateCurrentSpot();
     },
     deleteHotSpot() {
       this.controller.removeHotSpot();
+      this.updateCurrentSpot();
     },
     moveHotSpot() {
       this.controller.moveHotSpot();
+      this.updateCurrentSpot();
     },
     handleImages(files) {
       files.forEach(file => {
@@ -170,10 +178,11 @@ fieldset {
   justify-self: center;
 }
 
+#spot-selected-indicator {
+  margin-bottom: 5px;
+}
 
-
-#syncronise-btn,  #load-pano-btn {
-   width: 50%;
+#menu-btns {
    margin-top: 10px;
    margin-bottom: 10px;
 }

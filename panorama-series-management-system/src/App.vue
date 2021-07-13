@@ -15,9 +15,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-  #menu {
-    width: 400px;
-  }
-</style>
