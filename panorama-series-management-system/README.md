@@ -1,5 +1,3 @@
-# vue-pannellum-interface
-
 ## Project setup
 ```
 npm install
