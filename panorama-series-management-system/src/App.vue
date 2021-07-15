@@ -1,17 +1,21 @@
 <template>
   <v-app>
-    <EditorApp>
-    </EditorApp>
+    <editor-app></editor-app>
   </v-app>
 </template>
 
 <script>
-import EditorApp from '@/components/EditorApp'
+import EditorApp from './components/EditorApp.vue';
 
 export default {
   name: 'App',
-  components:{
+
+  components: {
     EditorApp
-  }
+  },
+
+  data: () => ({
+    //
+  }),
 };
 </script>

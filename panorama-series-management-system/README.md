@@ -1,3 +1,5 @@
+# panorama-series-management-system
+
 ## Project setup
 ```
 npm install

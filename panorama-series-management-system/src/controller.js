@@ -19,7 +19,7 @@ export default class Controller{
             },
             'scenes': [],
             "strings": {
-                "loadButtonLabel": "Нажмите, чтобы <br>Загрузить<br>Панораму",
+                "loadButtonLabel": "Нажмите, чтобы<br>Загрузить<br>Панораму",
                 "loadingLabel": "Загрузка...",
                 "bylineLabel": "by %s",
                 "noPanoramaError": "Панорама не указана.",
@@ -107,16 +107,16 @@ export default class Controller{
         hotSpotDebugIcon.style.display = this.editingMode ? 'block': 'none';
     }
 
-    addHotSpot(spotType, spotId = -1, transitionScene) {
+    addHotSpot(scene = this.currentScenePath, spotType, spotId = -1, transitionScene) {
         let id = spotId != -1? spotId: this.viewer.getConfig()["hotSpots"].length;
 
         spotType == 'info' ? 
-            this.addInfoSpot(this.pitch, this.yaw, this.text, id): 
-            this.addTransitSpot(this.pitch, this.yaw, this.text, id, transitionScene);
+            this.addInfoSpot(scene, this.pitch, this.yaw, this.text, id): 
+            this.addTransitSpot(scene, this.pitch, this.yaw, this.text, id, transitionScene);
         this.applyTransitionClicks();
     }
     
-    addInfoSpot(pitch, yaw, text, id) {
+    addInfoSpot(scene, pitch, yaw, text, id) {
         let that = this;
         this.viewer.addHotSpot({
             'pitch': pitch,
@@ -127,7 +127,7 @@ export default class Controller{
             'clickHandlerFunc': function() {
                 that.getHotSpotInfo(this);
             }
-        }, that.currentScenePath);
+        }, scene);
     }
     
     getHotSpotInfo(spot) {
@@ -139,7 +139,7 @@ export default class Controller{
         }
     }
 
-    addTransitSpot(pitch, yaw, text, id, transitionScene) {
+    addTransitSpot(scene, pitch, yaw, text, id, transitionScene) {
         this.viewer.addHotSpot({
             'pitch': pitch,
             'yaw': yaw,
@@ -147,7 +147,7 @@ export default class Controller{
             'text': text,
             'id': id,
             'sceneId': transitionScene
-        });
+        }, scene);
     }
     
     transitSpotClick(spot) {
@@ -175,7 +175,7 @@ export default class Controller{
     moveHotSpot() {
         let spot = this.currentSpot;
         this.removeHotSpot();
-        this.addHotSpot(spot.type, this.pitch, this.yaw, this.text, spot.id, spot.sceneID);
+        this.addHotSpot(this.currentScenePath, spot.type, this.pitch, this.yaw, this.text, spot.id, spot.sceneID);
         this.applyTransitionClicks();
         this.clearCurrentSpotInfo();
     }
@@ -190,18 +190,24 @@ export default class Controller{
         this.clearCurrentSpotInfo();
     }
 
-    saveSpotsFromScene(scene = this.currentScenePath) {
-        let data = JSON.stringify(this.viewer.getConfig()['scenes'][scene]['hotSpots']);
-        localStorage.setItem(scene, data);
+    getSpotsFromScene(scene = this.currentScenePath) {
+        if (scene in this.viewer.getConfig().scenes) {
+            let data = this.viewer.getConfig().scenes[scene].hotSpots;
+            return data;
+        }
+
     }
 
-    loadSpotsToScene(scene = this.currentScenePath) {
-        let data = localStorage.getItem(scene);
-        if (data != undefined){
-            let spots = JSON.parse(data);
+    loadSpotsToScene(scene = this.currentScenePath, spots = undefined) {
+        console.log(this.viewer.getConfig())
+        if (spots != undefined && scene in this.viewer.getConfig().scenes){
             spots.forEach(spot => {
-                if (this.viewer.getConfig().hotSpots[spot.id] == undefined)
-                this.addHotSpot(spot.type, spot.pitch, spot.yaw, spot.text, spot.id, spot.sceneId);
+                if (this.viewer.getConfig().hotSpots[spot.id] == undefined) {
+                    this.pitch = spot.pitch;
+                    this.yaw = spot.yaw;
+                    this.text = spot.text;
+                    this.addHotSpot(scene, spot.type, spot.id, spot.sceneId);
+                }
             });
         }
     }

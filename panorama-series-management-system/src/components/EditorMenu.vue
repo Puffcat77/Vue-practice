@@ -9,27 +9,27 @@
         </fieldset>
         <fieldset>
           <legend>Редактор панорамы</legend>
-            <v-checkbox v-model='panoramaIsEditing'
-            label='Панорама редактируется'
-            :disabled='!currentSceneSelected'
-            @change='editingModeChanged()'>
-            </v-checkbox>
-            <v-btn 
-            :disabled='!panoramaIsEditing'
-            rounded
-            @click='getCenterClicked()'>Координаты центра</v-btn>
-            <v-select v-model='spotType'
-              :disabled='isInputDisabled'
-              :items='spotTypes'
-              item-text='text'
-              item-value='value'
-              label='Выберите тип метки'>
-            </v-select>
-            <PanoramaSelector  
-              :disabilityCondition='isTransitSceneDisabeled'
-              :scenes='scenes' 
-              :baseOptionText='"Выберите панораму для перехода"'
-              @sceneChanged='transitionSceneChanged'></PanoramaSelector>
+          <v-checkbox v-model='panoramaIsEditing'
+          label='Панорама редактируется'
+          :disabled='!currentSceneSelected'
+          @change='editingModeChanged()'>
+          </v-checkbox>
+          <v-btn 
+          :disabled='!panoramaIsEditing'
+          rounded
+          @click='getCenterClicked()'>Координаты центра</v-btn>
+          <v-select v-model='spotType'
+            :disabled='isInputDisabled'
+            :items='spotTypes'
+            item-text='text'
+            item-value='value'
+            label='Выберите тип метки'>
+          </v-select>
+          <PanoramaSelector  
+            :disabilityCondition='isTransitSceneDisabeled'
+            :scenes='scenes' 
+            :baseOptionText='"Выберите панораму для перехода"'
+            @sceneChanged='transitionSceneChanged'></PanoramaSelector>
           <v-text-field label='Вертикаль' v-model='controller.pitch' :disabled='isInputDisabled'></v-text-field>
           <v-text-field label='Горизонталь' v-model='controller.yaw' :disabled='isInputDisabled'></v-text-field>
           <v-text-field label='Описание' v-model='controller.text' :disabled='isInputDisabled'></v-text-field>
@@ -38,16 +38,28 @@
               <v-chip color='green' class='spot-selected' outlined > {{ getCurrentSpotText() }}</v-chip>
             </v-row>
             <v-row justify="space-around" class='mb-5'>
-              <v-btn :disabled='isButtonDisabled' @click='addHotSpot' rounded>Добавить метку</v-btn>
-              <v-btn :disabled='isSpotEditButtonDisabled' @click='deleteHotSpot' rounded>Удалить метку</v-btn>
-              <v-btn :disabled='isSpotEditButtonDisabled' @click='moveHotSpot' rounded>Переместить метку</v-btn>
+              <v-btn :disabled='isButtonDisabled' @click='addHotSpot' fab><v-icon>mdi-plus</v-icon></v-btn>
+              <v-btn :disabled='isSpotEditButtonDisabled' @click='deleteHotSpot' fab><v-icon>mdi-minus</v-icon></v-btn>
+              <v-btn :disabled='isSpotEditButtonDisabled' @click='moveHotSpot' fab><v-icon>mdi-circle-edit-outline</v-icon></v-btn>
+              <v-btn :disabled='isDataBtnDisabled' @click='saveData' fab><v-icon>mdi-content-save-outline</v-icon></v-btn>
             </v-row>
             <v-row  justify='center' class="mb-5">
-              <v-btn :disabled='true' id='save-btn' rounded>Сохранить данные</v-btn>
-              <v-btn :disabled='true' id='load-btn' rounded>Загрузить данные</v-btn>
-              </v-row>
+              <v-file-input 
+                @change="loadData" 
+                :disabled='isDataBtnDisabled' 
+                accept="application/json" 
+                label='Файл с метками'></v-file-input>
+            </v-row>
+            <v-row justify='center' class="mb-5">
+              <v-file-input 
+                @change="handleImages" 
+                accept="image/png, image/jpeg, image/bmp" 
+                label='Панорамы' 
+                prepend-icon="mdi-image"
+                multiple></v-file-input>
+            </v-row>
             <v-row class='row-btns'>
-              <UploadImages id='pano-load-btn' @change='handleImages' uploadMsg='Нажмите, чтобы загрузить или перетяните сюда панорамы.'/>
+              
             </v-row>
           </v-container>
         </fieldset>
@@ -56,14 +68,12 @@
 
 <script>
 import PanoramaSelector from '@/components/PanoramaSelector';
-import UploadImages from "vue-upload-drop-images"
 import ControllerService from './ControllerService';
 
 export default {
   name: 'EditorMenu',
   components: {
-    PanoramaSelector,
-    UploadImages
+    PanoramaSelector
   },
   data() {
       return {
@@ -108,6 +118,9 @@ export default {
     },
     isTransitSceneDisabeled() {
       return !this.panoramaIsEditing || this.spotType != 'scene' || this.spotType == undefined; 
+    },
+    isDataBtnDisabled() {
+      return this.scenes.length == 0;
     }
   },
   
@@ -135,7 +148,7 @@ export default {
     },
     addHotSpot() {
       this.controller.addHotSpot(
-        this.spotType, undefined, this.transitionScene);
+        this.currentScene, this.spotType, undefined, this.transitionScene);
       this.updateCurrentSpot();
     },
     deleteHotSpot() {
@@ -148,10 +161,6 @@ export default {
     },
     handleImages(files) {
       files.forEach(file => {
-        if (file.type === 'text/html' ||
-            file.type === 'text/css' ||
-            file.type === 'text/javascript')
-        return;
 
         let name = file.name.split('.')[0];
         let url = URL.createObjectURL(file)
@@ -161,12 +170,45 @@ export default {
           title: name
         })
       });
+    },
+    saveData() {
+      let scenesData = {};
+      for(let i = 0; i < this.scenes.length; i++) {
+        let scene = this.scenes[i]
+        scenesData[scene.title] = ControllerService.controller.getSpotsFromScene(scene.path)
+      }
+      let data = JSON.stringify(scenesData);
+
+      console.log(data);
+
+      // TODO: send data to server
+    },
+    loadData(file) {
+      let reader = new FileReader();
+      reader.readAsText(file);
+
+      reader.onload = () => {
+        let data = JSON.parse(reader.result);
+
+        for(let d in data) {
+          if (this.scenes.length > 0) {
+            alert(d)
+            let i = this.scenes.map((scene) => { return scene.title }).indexOf(d);
+            let scene = this.scenes[i];
+            let spots = data[d];
+            console.log(spots)
+            if (scene != undefined && spots != undefined)
+              ControllerService.controller.loadSpotsToScene(scene.path, spots);
+          }
+        }
+      };
     }
   }
 }
 </script>
 
 <style>
+
 fieldset {
   padding: 5px;
 }

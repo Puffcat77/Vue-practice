@@ -1,9 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-import vuetify from './plugins/vuetify';
-import i18n from 'vue-i18n';
-
-Vue.use(i18n);
+import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false
 
