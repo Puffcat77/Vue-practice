@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id='editor-app'>
     <editor-app></editor-app>
   </v-app>
 </template>
@@ -17,3 +17,10 @@ export default {
   data: () => ({}),
 };
 </script>
+
+<style>
+#editor-app {
+  min-width: 540px;
+}
+
+</style>

@@ -180,7 +180,6 @@ export default class Controller{
     }
 
     loadSpotsToScene(scene = this.currentScenePath, spots = undefined) {
-        console.log(this.viewer.getConfig())
         if (spots != undefined && scene in this.viewer.getConfig().scenes){
             spots.forEach(spot => {
                 if (this.viewer.getConfig().hotSpots[spot.id] == undefined) {

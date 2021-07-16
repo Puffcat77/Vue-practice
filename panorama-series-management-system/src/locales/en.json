@@ -1,0 +1,20 @@
+{
+  "messages": {
+    "programTitle": "Panorama series management system",
+    "curPanoSelectorLegend": "Current panorama",
+    "curPanoSelectorBaseOption": "Choose current panorama",
+    "editMenuLegend": "Panorama editor",
+    "panoEditingSwitch": "Panorama is editing",
+    "centerCoordinatesBtn": "Cross coordinates",
+    "spotTypeSelectorLabel": "Choose spot type",
+    "horizontalCoord": "Pitch",
+    "verticalCoord": "Yaw",
+    "spotDescription": "Description",
+    "spotNotSelected": "Spot isn't selected",
+    "spotSelected": "Selected spot: ",
+    "infoSpotType": "Info",
+    "transitSpotType": "Transit",
+    "spotFileLabel": "Config file with spots",
+    "panoLoadLabel": "Panoramas"
+  }
+}

@@ -1,41 +1,41 @@
 <template>
     <div id='menu'>
         <fieldset>
-          <legend>Текущая панорама</legend>
+          <legend>{{ curPanoSelectorLegend }}</legend>
           <PanoramaSelector
           :scenes='scenes'
-          :baseOptionText='"Выберите текущую панораму"'
+          :baseOptionText='curPanoSelectorBaseOption'
           @sceneChanged='currentSceneChanged'></PanoramaSelector>
         </fieldset>
         <fieldset>
-          <legend>Редактор панорамы</legend>
+          <legend>{{ editMenuLegend }}</legend>
           <v-switch v-model='panoramaIsEditing'
-          label='Панорама редактируется'
+          :label='panoEditingSwitch'
           :disabled='!currentSceneSelected'
           @change='editingModeChanged()'>
           </v-switch>
           <v-btn 
           :disabled='!panoramaIsEditing'
           rounded
-          @click='getCenterClicked()'>Координаты центра</v-btn>
+          @click='getCenterClicked()'>{{ centerCoordinatesBtn }}</v-btn>
           <v-select v-model='spotType'
             :disabled='isInputDisabled'
             :items='spotTypes'
             item-text='text'
             item-value='value'
-            label='Выберите тип метки'>
+            :label='spotTypeSelectorLabel'>
           </v-select>
           <PanoramaSelector  
             :disabilityCondition='isTransitSceneDisabeled'
             :scenes='scenes' 
-            :baseOptionText='"Выберите панораму для перехода"'
+            :baseOptionText='panoTransitionSelector'
             @sceneChanged='transitionSceneChanged'></PanoramaSelector>
-          <v-text-field label='Вертикаль' v-model='controller.pitch' :disabled='isInputDisabled'></v-text-field>
-          <v-text-field label='Горизонталь' v-model='controller.yaw' :disabled='isInputDisabled'></v-text-field>
-          <v-text-field label='Описание' v-model='controller.text' :disabled='isInputDisabled'></v-text-field>
+          <v-text-field :label='verticalCoord' v-model='controller.pitch' :disabled='isInputDisabled'></v-text-field>
+          <v-text-field :label='horizontalCoord' v-model='controller.yaw' :disabled='isInputDisabled'></v-text-field>
+          <v-text-field :label='spotDescription' v-model='controller.text' :disabled='isInputDisabled'></v-text-field>
           <v-container id='menu-btns'>
             <v-row justify="center" id='spot-selected-indicator'>
-              <v-chip color='green' class='spot-selected' outlined > {{ getCurrentSpotText() }}</v-chip>
+              <v-chip color='green' class='spot-selected' outlined > {{ currentSpotText }}</v-chip>
             </v-row>
             <v-row justify="space-around" class='mb-5'>
               <v-btn :disabled='isButtonDisabled' @click='addHotSpot' fab><v-icon>mdi-plus</v-icon></v-btn>
@@ -48,13 +48,13 @@
                 @change="loadData" 
                 :disabled='isDataBtnDisabled' 
                 accept="application/json" 
-                label='Файл с метками'></v-file-input>
+                :label='spotFileLabel'></v-file-input>
             </v-row>
             <v-row justify='center' class="mb-5">
               <v-file-input 
                 @change="handleImages" 
                 accept="image/png, image/jpeg, image/bmp" 
-                label='Панорамы' 
+                :label='panoLoadLabel' 
                 prepend-icon="mdi-image"
                 multiple></v-file-input>
             </v-row>
@@ -69,6 +69,7 @@
 <script>
 import PanoramaSelector from '@/components/PanoramaSelector';
 import ControllerService from './ControllerService';
+import i18nService from './InternalizationService';
 
 export default {
   name: 'EditorMenu',
@@ -81,16 +82,6 @@ export default {
         currentScene: undefined,
         transitionScene: undefined,
         panoramaIsEditing: false,
-        spotTypes: [
-          {
-            value: 'info',
-            text: 'Информационная'
-          },
-          {
-            value: 'scene',
-            text: 'Переход'
-          }
-        ],
         spotType: 'info',
         controller: ControllerService.controller,
         currentSpot: ControllerService.controller.currentSpot
@@ -110,18 +101,38 @@ export default {
       let isTransitionSceneChosen = this.spotType == 'scene' && this.transitionScene != undefined || this.spotType == 'info';
       return !(isPitchAcceptable && isYawAcceptable && isDescriptionAcceptaple && isTransitionSceneChosen && this.panoramaIsEditing);
     },
-    isSpotEditButtonDisabled() {
-      return !this.panoramaIsEditing || this.currentSpot == undefined;
-    },
-    currentSceneSelected() {
-      return this.currentScene != undefined;
-    },
-    isTransitSceneDisabeled() {
-      return !this.panoramaIsEditing || this.spotType != 'scene' || this.spotType == undefined; 
-    },
-    isDataBtnDisabled() {
-      return this.scenes.length == 0;
-    }
+    spotTypes() { return [
+      {
+        value: 'info',
+        text: this.infoSpotType
+      },
+      {
+        value: 'scene',
+        text: this.transitSpotType
+      }
+    ]},
+    isSpotEditButtonDisabled() { return !this.panoramaIsEditing || this.currentSpot == undefined; },
+    currentSceneSelected() { return this.currentScene != undefined; },
+    currentSpotText() { return this.currentSpot ? this.spotSelected + this.currentSpot.text : this.spotNotSelected; },
+    isTransitSceneDisabeled() { return !this.panoramaIsEditing || this.spotType != 'scene' || this.spotType == undefined; },
+    isDataBtnDisabled() { return this.scenes.length == 0; },
+    curPanoSelectorLegend() { return i18nService.curPanoSelectorLegend },
+    curPanoSelectorBaseOption() { return i18nService.curPanoSelectorBaseOption },
+    editMenuLegend() { return i18nService.editMenuLegend },
+    panoEditingSwitch() { return i18nService.centerCoordinatesBtn},
+    centerCoordinatesBtn() {return i18nService.centerCoordinatesBtn },
+    spotTypeSelectorLabel() { return i18nService.spotTypeSelectorLabel},
+    panoTransitionSelector() { return i18nService.panoTransitionSelector },
+    horizontalCoord() { return i18nService.horizontalCoord},
+    verticalCoord() { return i18nService.verticalCoord },
+    spotDescription() { return i18nService.spotDescription },
+    spotNotSelected() { return i18nService.spotNotSelected },
+    spotSelected() { return i18nService.spotSelected },
+    infoSpotType() { return i18nService.infoSpotType },
+    transitSpotType() { return i18nService.transitSpotType},
+    spotFileLabel() { return i18nService.spotFileLabel },
+    panoLoadLabel() { return i18nService.panoLoadLabel },
+        
   },
   
   methods: {
@@ -132,9 +143,6 @@ export default {
       this.currentScene = scene;
       this.controller.loadScene(this.currentScene);
       this.controller.setHomeScenePath(this.currentScene);
-    },
-    getCurrentSpotText() {
-      return this.currentSpot ? 'Выбрана метка: ' + this.currentSpot.text : 'Метка не выбрана';
     },
     transitionSceneChanged(scene) {
       this.transitionScene = scene;
@@ -177,9 +185,7 @@ export default {
         let scene = this.scenes[i]
         scenesData[scene.title] = ControllerService.controller.getSpotsFromScene(scene.path)
       }
-      let data = JSON.stringify(scenesData);
-
-      console.log(data);
+      // let data = JSON.stringify(scenesData);
 
       // TODO: send data to server
     },
@@ -196,7 +202,6 @@ export default {
             let i = this.scenes.map((scene) => { return scene.title }).indexOf(d);
             let scene = this.scenes[i];
             let spots = data[d];
-            console.log(spots)
             if (scene != undefined && spots != undefined)
               ControllerService.controller.loadSpotsToScene(scene.path, spots);
           }
