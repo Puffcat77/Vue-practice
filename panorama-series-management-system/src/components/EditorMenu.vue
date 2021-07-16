@@ -9,11 +9,11 @@
         </fieldset>
         <fieldset>
           <legend>Редактор панорамы</legend>
-          <v-checkbox v-model='panoramaIsEditing'
+          <v-switch v-model='panoramaIsEditing'
           label='Панорама редактируется'
           :disabled='!currentSceneSelected'
           @change='editingModeChanged()'>
-          </v-checkbox>
+          </v-switch>
           <v-btn 
           :disabled='!panoramaIsEditing'
           rounded

@@ -3,13 +3,14 @@ import 'pannellum/src/js/libpannellum';
 
 export default class Controller{
     
-    constructor() {
+    constructor(viewerStringsConfig = undefined) {
         this.homeScenePath;
         this.editingMode = false;
         this.pitch = 0;
         this.yaw = 0;
         this.text = '';
         this.currentSpot;
+        this.homeBtn;
 
         let viewerConfig = {
             'default': {
@@ -18,19 +19,10 @@ export default class Controller{
                 'autoLoad': true
             },
             'scenes': [],
-            "strings": {
-                "loadButtonLabel": "Нажмите, чтобы<br>Загрузить<br>Панораму",
-                "loadingLabel": "Загрузка...",
-                "bylineLabel": "by %s",
-                "noPanoramaError": "Панорама не указана.",
-                "fileAccessError": "Файл %s не удается получить.",
-                "malformedURLError": "Что-то не так с URL панорамы.",
-                "iOS8WebGLError": "Из-за сломанной реализации WebGL в iOS 8 для вашего устройства работают только JPEG с прогрессивной кодировкой (эта панорама использует стандартную кодировку).",
-                "genericWebGLError": "Ваш браузер не имеет необходимой поддержки WebGL для отображения этой панорамы.",
-                "textureSizeError": "Это панорама слишком большая для вашего устройства! Её ширина %spx, но ваше устройство поддерживает только %spx в ширину. Попробуйте другое устройство. (Если вы автор, попробуйте уменьшить изображение.)",
-                "unknownError": "Неизвестная ошибка, проверьте консоль разработчика."
-            }
+            'showControls': false,
         };
+        if (viewerStringsConfig != undefined)
+            viewerConfig['strings'] = viewerStringsConfig;
         this.viewerContainer = document.createElement('div');
         this.viewerContainer.id = 'viewer-container';
         this.viewer = window.pannellum.viewer(this.viewerContainer, viewerConfig);
@@ -38,8 +30,6 @@ export default class Controller{
             this.loadSpotsToScene();
             this.applyTransitionClicks();
         });
-
-        this.createHomeButtton();
     }
 
     clearCurrentSpotInfo() {
@@ -62,17 +52,8 @@ export default class Controller{
         this.editingMode = modeState;
     }
 
-    createHomeButtton() {
-        let button = document.createElement('input');
-        button.type='button';
-        button.id='homeButton'
-        button.value = 'Home';
-        button.style.border = '1px solid #999';
-        button.style.padding = '2px 10px';
+    addHomeButton(button) {
         button.style.display = 'none';
-        button.style.background = 'white';
-        button.style.borderColor = 'black';
-        button.style.borderRadius = '20%';
         button.onclick = () => {
             this.viewer.loadScene(this.homeScenePath);
             button.style.display = 'none';
@@ -81,6 +62,7 @@ export default class Controller{
         button.style.top = '4px';
         button.style.right = '4px';
         this.viewerContainer.getElementsByClassName('pnlm-ui')[0].appendChild(button);
+        this.homeBtn = button;
     }
 
     setCenterPosition() {
@@ -156,8 +138,7 @@ export default class Controller{
         }
         else {
             this.currentScenePath = spot.sceneId;
-            let homeButton = document.getElementById('homeButton');
-            homeButton.style.display = this.currentScenePath == this.homeScenePath ? 'none' : 'block';
+            this.homeBtn.style.display = this.currentScenePath == this.homeScenePath ? 'none' : 'block';
             this.loadScene(spot.sceneId);
         }
     }

@@ -1,5 +1,7 @@
 <template>
-    <div class='viewer-container'></div>
+    <div class='viewer-container'>
+        <v-btn fab small id="homeBtn" fixed ><v-icon>mdi-home</v-icon></v-btn>
+    </div>
 </template>
 
 <script type='module'>
@@ -13,6 +15,9 @@ export default {
     mounted() {
         this.$el.appendChild(ControllerService.controller.getViewerContainer());
         this.$el.onclick = () => { ControllerService.containerTouched()};
+        let homeBtn = this.$el.children[0];
+        this.$el.removeChild(homeBtn);
+        ControllerService.controller.addHomeButton(homeBtn);
     }
 }
 </script>

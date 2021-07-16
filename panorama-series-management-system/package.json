@@ -11,6 +11,8 @@
     "core-js": "^3.6.5",
     "pannellum": "^2.5.6",
     "vue": "^2.6.11",
+    "vue-flag-icon": "^1.0.6",
+    "vue-i18n": "^9.1.7",
     "vuetify": "^2.4.0"
   },
   "devDependencies": {

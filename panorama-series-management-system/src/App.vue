@@ -14,8 +14,6 @@ export default {
     EditorApp
   },
 
-  data: () => ({
-    //
-  }),
+  data: () => ({}),
 };
 </script>
