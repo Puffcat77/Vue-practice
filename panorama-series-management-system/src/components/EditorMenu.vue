@@ -171,12 +171,14 @@ export default {
       files.forEach(file => {
 
         let name = file.name.split('.')[0];
-        let url = URL.createObjectURL(file)
+        let url = URL.createObjectURL(file);
 
         this.scenes.push({
           path: url,
           title: name
-        })
+        });
+
+        ControllerService.controller.addScene(url);
       });
     },
     saveData() {
@@ -198,7 +200,6 @@ export default {
 
         for(let d in data) {
           if (this.scenes.length > 0) {
-            alert(d)
             let i = this.scenes.map((scene) => { return scene.title }).indexOf(d);
             let scene = this.scenes[i];
             let spots = data[d];
