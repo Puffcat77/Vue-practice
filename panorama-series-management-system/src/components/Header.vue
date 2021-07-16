@@ -19,6 +19,7 @@
 
 <script>
 import i18nService from './InternalizationService'
+import ControllerService from './ControllerService'
 
 
 export default {
@@ -40,6 +41,7 @@ export default {
     methods: {
         languageChanged() {
             i18nService.changeLang(this.lang);
+            ControllerService.changeViewerStrings()
         }
     },
     computed: {

@@ -10,6 +10,7 @@ export default new Vue({
         return {
             controller: contr,
             menu: undefined,
+            container: {}
         }
     },
     methods: {
@@ -18,8 +19,13 @@ export default new Vue({
         },
         changeViewerStrings() {
             let strings = i18nService.viewerConfigStrings;
-            console.log(strings)
-            console.log(this.controller.viewer.getConfig())
+            let newConfig = this.controller.viewer.getConfig()
+            newConfig.strings = strings;
+            this.controller = new Controller(newConfig);
+            this.container.fillContainer();
+        },
+        addContainer(container) {
+            this.container = container;
         }
     }
 })

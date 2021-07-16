@@ -3,7 +3,7 @@ import 'pannellum/src/js/libpannellum';
 
 export default class Controller{
     
-    constructor(viewerStringsConfig = undefined) {
+    constructor(viewerConfig = undefined) {
         this.homeScenePath;
         this.editingMode = false;
         this.pitch = 0;
@@ -12,17 +12,16 @@ export default class Controller{
         this.currentSpot;
         this.homeBtn;
 
-        let viewerConfig = {
-            'default': {
-                'type': 'equirectangular',
-                'hotSpots': [],
-                'autoLoad': true
-            },
-            'scenes': [],
-            'showControls': false,
-        };
-        if (viewerStringsConfig != undefined)
-            viewerConfig['strings'] = viewerStringsConfig;
+        if (viewerConfig == undefined)
+            viewerConfig = {
+                'default': {
+                    'type': 'equirectangular',
+                    'hotSpots': [],
+                    'autoLoad': true
+                },
+                'scenes': [],
+                'showControls': false,
+            };
         this.viewerContainer = document.createElement('div');
         this.viewerContainer.id = 'viewer-container';
         this.viewer = window.pannellum.viewer(this.viewerContainer, viewerConfig);
@@ -32,25 +31,15 @@ export default class Controller{
         });
     }
 
-    clearCurrentSpotInfo() {
-        this.currentSpot = null;
-    }
+    clearCurrentSpotInfo() { this.currentSpot = null; }
 
-    setHomeScenePath(scenePath) {
-        this.homeScenePath = scenePath;
-    }
+    setHomeScenePath(scenePath) { this.homeScenePath = scenePath; }
 
-    getViewer() {
-        return this.viewer;
-    }
+    getViewer() { return this.viewer; }
 
-    getViewerContainer() {
-        return this.viewerContainer;
-    }
+    getViewerContainer() { return this.viewerContainer; }
 
-    setEditingMode(modeState) {
-        this.editingMode = modeState;
-    }
+    setEditingMode(modeState) { this.editingMode = modeState; }
 
     addHomeButton(button) {
         button.style.display = 'none';
